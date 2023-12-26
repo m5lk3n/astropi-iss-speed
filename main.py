@@ -53,7 +53,7 @@ timeInS = 63
 speedInKmPerS5 = distanceInKm / timeInS
 print(distanceInKm, "km in", timeInS, "s =", speedInKmPerS5, "km/s")
 
-avgSpeedInKmPerS = (speedInKmPerS1 + speedInKmPerS2 + speedInKmPerS3 + speedInKmPerS4 +speedInKmPerS5) / 5
+avgSpeedInKmPerS = (speedInKmPerS1 + speedInKmPerS2 + speedInKmPerS3 + speedInKmPerS4 + speedInKmPerS5) / 5
 
 print("Avg. travel speed across 5 data points: %.4f" % avgSpeedInKmPerS, "km/s")
 print("Actual travel speed of the ISS: 7.66kmps") # https://projects.raspberrypi.org/en/projects/astropi-iss-speed/7
@@ -73,12 +73,13 @@ def get_time(image):
     with open(image, 'rb') as image_file:
         img = Image(image_file)
         time_str = img.get("datetime_original")
+        # TODO: if time_str, else value? handling?
         time = datetime.strptime(time_str, '%Y:%m:%d %H:%M:%S')
         # https://pynative.com/python-datetime-to-seconds/
         epoch_time = datetime(1970, 1, 1)
         delta = (time - epoch_time)
         
-    return delta.total_seconds()
+    return delta.total_seconds() # TODO: absolute value?
 
 def get_location(image):
     with open(image, 'rb') as image_file:
@@ -89,17 +90,14 @@ def get_location(image):
         lon_ref_str = img.get("gps_longitude_ref")
         lon_str = img.get("gps_longitude") # tuple of degrees, minutes, and seconds
         
-        lat = convert_to_degress(lat_str)
-        if lat_ref_str != 'N':
-            lat = 0 - lat
+        if lat_ref_str and lat_str and lon_ref_str and lon_str: # TODO: else value? handling?
+            lat = convert_to_degress(lat_str)
+            if lat_ref_str != 'N':
+                lat = 0 - lat
         
-        lon = convert_to_degress(lon_str)
-        if lon_ref_str != 'E':
-            lon = 0 - lon
-        # how to convert to degrees:
-        # - https://gist.github.com/snakeye/fdc372dbf11370fe29eb
-        # - https://stackoverflow.com/questions/4764932/in-python-how-do-i-read-the-exif-data-for-an-image
-        # - https://stackoverflow.com/questions/6460381/translate-exif-dms-to-dd-geolocation-with-python
+            lon = convert_to_degress(lon_str)
+            if lon_ref_str != 'E':
+                lon = 0 - lon
     return lon, lat
 
 def convert_to_degress(value):
@@ -118,13 +116,42 @@ def convert_to_degress(value):
 # GPS Longitude - 19 deg 38' 33.20"
 #print(get_location('photos/photo_232.jpg'))
 
-t0 = get_time('photos/1.jpg')
-t1 = get_time('photos/2.jpg')
+t0 = get_time('photos/photo_232.jpg')
+t1 = get_time('photos/photo_237.jpg')
 timeInS = t1 - t0
 
-loc0 = get_location('photos/1.jpg')
-loc1 = get_location('photos/2.jpg')
+loc0 = get_location('photos/photo_232.jpg')
+loc1 = get_location('photos/photo_237.jpg')
 distanceInKm = haversine(loc1[0],loc1[1],loc0[0],loc0[1])
 
-speedInKmPerS = distanceInKm / timeInS
-print(distanceInKm, "km in", timeInS, "s =", speedInKmPerS, "km/s")
+speedInKmPerS1 = distanceInKm / timeInS # TODO: absolute value?
+print(distanceInKm, "km in", timeInS, "s =", speedInKmPerS1, "km/s")
+
+t0 = get_time('photos/photo_237.jpg')
+t1 = get_time('photos/photo_242.jpg')
+timeInS = t1 - t0
+
+loc0 = get_location('photos/photo_237.jpg')
+loc1 = get_location('photos/photo_242.jpg')
+print(loc1)
+distanceInKm = haversine(loc1[0],loc1[1],loc0[0],loc0[1])
+
+speedInKmPerS2 = distanceInKm / timeInS # TODO: absolute value?
+print(distanceInKm, "km in", timeInS, "s =", speedInKmPerS2, "km/s")
+
+t0 = get_time('photos/Andromeda_0025.jpg')
+t1 = get_time('photos/Andromeda_0041.jpg')
+timeInS = t1 - t0
+
+loc0 = get_location('photos/Andromeda_0025.jpg')
+loc1 = get_location('photos/Andromeda_0041.jpg')
+print(loc1)
+distanceInKm = haversine(loc1[0],loc1[1],loc0[0],loc0[1])
+
+speedInKmPerS3 = distanceInKm / timeInS # TODO: absolute value?
+print(distanceInKm, "km in", timeInS, "s =", speedInKmPerS3, "km/s")
+
+avgSpeedInKmPerS = (speedInKmPerS1 + speedInKmPerS2 + speedInKmPerS3) / 3
+
+print("Avg. travel speed across 3 photos: %.4f" % avgSpeedInKmPerS, "km/s")
+print("Actual travel speed of the ISS: 7.66kmps") # https://projects.raspberrypi.org/en/projects/astropi-iss-speed/7
