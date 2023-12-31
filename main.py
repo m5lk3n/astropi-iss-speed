@@ -16,8 +16,11 @@ def haversine(lon1, lat1, lon2, lat2):
     dlat = lat2 - lat1 
     a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
     c = 2 * asin(sqrt(a)) 
-    r = 6371 # Radius of earth in kilometers. Determines return value unit as km.
-    r += 400 # ISS orbits earth (https://www.esa.int/Science_Exploration/Human_and_Robotic_Exploration/Lessons_online/Life_in_Space#:~:text=The%20ISS%20is%20orbiting%20400,be%20taken%20there%20from%20Earth.)
+    r = 6371 # Earth's mean radius in kilometers. Determines return value unit as km.
+    # - https://sci.esa.int/web/solar-system/-/35649-earth
+    r += 420 # ISS orbits earth at ~420km altitude as per ESA ISS tracker info
+    # - https://www.esa.int/Science_Exploration/Human_and_Robotic_Exploration/International_Space_Station/Where_is_the_International_Space_Station
+    # - https://www.esa.int/Science_Exploration/Human_and_Robotic_Exploration/Lessons_online/Life_in_Space#:~:text=The%20ISS%20is%20orbiting%20400,be%20taken%20there%20from%20Earth.
     return c * r
 
 # ---------- data points approach ----------
@@ -55,7 +58,7 @@ print(distanceInKm, "km in", timeInS, "s =", speedInKmPerS5, "km/s")
 
 avgSpeedInKmPerS = (speedInKmPerS1 + speedInKmPerS2 + speedInKmPerS3 + speedInKmPerS4 + speedInKmPerS5) / 5
 
-print("Avg. travel speed across 5 data points: %.4f" % avgSpeedInKmPerS, "km/s")
+print("Avg. travel speed across 5 data points: %.5f" % avgSpeedInKmPerS, "km/s")
 print("Actual travel speed of the ISS: 7.66kmps") # https://projects.raspberrypi.org/en/projects/astropi-iss-speed/7
 
 print("----------")
@@ -153,5 +156,19 @@ print(distanceInKm, "km in", timeInS, "s =", speedInKmPerS3, "km/s")
 
 avgSpeedInKmPerS = (speedInKmPerS1 + speedInKmPerS2 + speedInKmPerS3) / 3
 
-print("Avg. travel speed across 3 photos: %.4f" % avgSpeedInKmPerS, "km/s")
+print("Avg. travel speed across 3 photos: %.5f" % avgSpeedInKmPerS, "km/s")
 print("Actual travel speed of the ISS: 7.66kmps") # https://projects.raspberrypi.org/en/projects/astropi-iss-speed/7
+
+# Format the estimate_kmps to have a precision
+# of 5 significant figures
+estimate_kmps_formatted = "{:.5f}".format(avgSpeedInKmPerS)
+
+# Create a string to write to the file
+output_string = estimate_kmps_formatted
+
+# Write to the file
+file_path = "result.txt"  # Replace with your desired file path
+with open(file_path, 'w') as file:
+    file.write(output_string)
+
+print("Data written to", file_path)
