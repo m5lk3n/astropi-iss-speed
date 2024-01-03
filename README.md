@@ -10,9 +10,14 @@ Mission Space Lab
 ## IDE
 
 1. Install [Thonny](https://thonny.org/)
-2. In Thonny, Tools -> Manage Packages -> Search and Install
+2. Install Packages:
+In Thonny, Tools -> Manage packages -> Search and Install
 - exif
 - logzero
+- black
+3. Install Plugins:
+In Thonny, Tools -> Manage plug-ins -> Search and Install
+- [thonny-black-format](https://pypi.org/project/thonny-black-formatter/)
 
 # to do
 
@@ -20,6 +25,7 @@ Mission Space Lab
 
 # refs
 
+- [Python Naming Conventions](https://gist.github.com/etigui/7600441926e73c3385057718c2fdef8e)
 - https://pythonhow.com/how/limit-floats-to-two-decimal-points/
 - https://stackoverflow.com/questions/455612/limiting-floats-to-two-decimal-points
 
