@@ -3,6 +3,7 @@ from time import sleep
 from math import radians, cos, sin, asin, sqrt
 from exif import Image
 from logzero import logger
+from picamera import PiCamera
 
 
 # https://stackoverflow.com/questions/4913349/haversine-formula-in-python-bearing-and-distance-between-two-gps-points
@@ -36,7 +37,7 @@ def convert_to_degress(value):
 
 
 # "CONSTANTS"
-IMAGE_PATH = "photos/"
+IMAGE_PATH = "tests/"  # for testing, use "" for deployment
 MAX_DURATION_IN_MINS = 1  # for testing, use 9 for deployment
 MAX_ITERATIONS = 3  # for testing, use 42 for deployment
 SLEEP_TIMEOUT_IN_SECS = 5  # for testing, TODO for deployment
@@ -84,9 +85,13 @@ def get_image_meta_data(i):
     return time_in_seconds, lat, lon
 
 
-def take_picture(i):
-    logger.info(f"taking picture {i}.jpg")
-    # close camera
+def take_picture(cam, i):
+    if IMAGE_PATH == "tests/":
+        return
+
+    logger.info(f"taking picture {IMAGE_PATH}{i}.jpg")
+    cam.capture(f"{IMAGE_PATH}{i}.jpg")
+    # TODO: exif
 
 
 def calc_speed_from_pictures(i):
@@ -119,17 +124,21 @@ def calc_speed_from_pictures(i):
 
 logger.info("started")
 
+# init.
 start_time = datetime.now()
 now_time = datetime.now()
 total_speed_in_kmps = 0
 i = 0  # iteration
+cam = PiCamera()
+cam.resolution = (4056, 3040)
+
 
 while now_time < start_time + timedelta(minutes=MAX_DURATION_IN_MINS):
     if i >= MAX_ITERATIONS:
         break  # exit while
 
     logger.info(f"iteration {i} started")
-    take_picture(i)
+    take_picture(cam, i)
     speed_in_kmps = calc_speed_from_pictures(i)
     logger.info(f"iteration {i} ended in {speed_in_kmps} km/s")
 
@@ -140,8 +149,10 @@ while now_time < start_time + timedelta(minutes=MAX_DURATION_IN_MINS):
     sleep(SLEEP_TIMEOUT_IN_SECS)
     now_time = datetime.now()
 
+cam.close()
+
 # we define a negative speed as an "invalid" value to indicate that we couldn't calculate
-avg_speed_in_kmps = -1
+avg_speed_in_kmps = -1.0
 if i > 1:  # we needed at least 2 iterations for a comparison
     avg_speed_in_kmps = total_speed_in_kmps / (i - 1)  # -1 to skip first iteration
 

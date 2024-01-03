@@ -18,9 +18,11 @@ In Thonny, Tools -> Manage packages -> Search and Install
 - exif
 - logzero
 - black
+- [astro-pi-replay](https://projects.raspberrypi.org/en/projects/mission-space-lab-creator-guide/2)
 3. Install Plugins:
 In Thonny, Tools -> Manage plug-ins -> Search and Install
 - [thonny-black-format](https://pypi.org/project/thonny-black-formatter/)
+- [thonny-astro-pi-replay](https://projects.raspberrypi.org/en/projects/mission-space-lab-creator-guide/2)
 
 # to do
 
