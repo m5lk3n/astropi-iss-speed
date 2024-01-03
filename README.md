@@ -5,6 +5,9 @@ Mission Space Lab
 - https://projects.raspberrypi.org/en/projects/astropi-iss-speed/
 - https://projects.raspberrypi.org/en/projects/mission-space-lab-creator-guide/
 
+- [Sample sensor data](https://docs.google.com/spreadsheets/d/1RjPEp2IHVB6For65wuUQdWntsg1H5sHWpYUtLzK9LCM/edit#gid=671905630)
+- [Sample photos](https://www.flickr.com/photos/raspberrypi/collections/72157722152451877/)
+
 # Prerequisites
 
 ## IDE
