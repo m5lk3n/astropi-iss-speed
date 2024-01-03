@@ -1,9 +1,18 @@
-# msl
+# Astro Pi Mission Space Lab
 
 Mission Space Lab
 
 - https://projects.raspberrypi.org/en/projects/astropi-iss-speed/
 - https://projects.raspberrypi.org/en/projects/mission-space-lab-creator-guide/
+
+# Prerequisites
+
+## IDE
+
+1. Install [Thonny](https://thonny.org/)
+2. In Thonny, Tools -> Manage Packages -> Search and Install
+- exif
+- logzero
 
 # to do
 
