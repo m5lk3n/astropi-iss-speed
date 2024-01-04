@@ -8,7 +8,7 @@ from orbit import ISS
 
 
 # https://stackoverflow.com/questions/4913349/haversine-formula-in-python-bearing-and-distance-between-two-gps-points
-def haversine(lon1, lat1, lon2, lat2):  # TODO: swap order lon <-> lat
+def haversine(lat1, lon1, lat2, lon2):
     """
     Calculate the great circle distance in kilometers between two points
     on the earth (specified in decimal degrees)
@@ -57,10 +57,14 @@ def get_time_in_seconds_since_epoch(image):
 
 
 def get_location_as_lat_lon(image):
-    lat_ref_str = image.get("gps_latitude_ref")
-    lat_str = image.get("gps_latitude")  # tuple of degrees, minutes, and seconds
-    lon_ref_str = image.get("gps_longitude_ref")
-    lon_str = image.get("gps_longitude")  # tuple of degrees, minutes, and seconds
+    lat_ref_str = image.get("gps_latitude_ref")  # retrieves Exif GPS.GPSLatitudeRef
+    lat_str = image.get(
+        "gps_latitude"
+    )  # retrieves Exif GPS.GPSLatitude = tuple of degrees, minutes, and seconds
+    lon_ref_str = image.get("gps_longitude_ref")  # retrieves Exif GPS.GPSLongitudeRef
+    lon_str = image.get(
+        "gps_longitude"
+    )  # retrieves Exif GPS.GPSLongitude = tuple of degrees, minutes, and seconds
 
     if (
         lat_ref_str and lat_str and lon_ref_str and lon_str
@@ -78,9 +82,9 @@ def get_location_as_lat_lon(image):
 
 def get_image_meta_data(iteration):
     with open(f"{IMAGE_PATH}{iteration}.jpg", "rb") as image_file:  # open read, binary
-        image = Image(image_file)
-        time_in_seconds = get_time_in_seconds_since_epoch(image)
-        lat, lon = get_location_as_lat_lon(image)
+        img = Image(image_file)
+        time_in_seconds = get_time_in_seconds_since_epoch(img)
+        lat, lon = get_location_as_lat_lon(img)
     image_file.close()
 
     return time_in_seconds, lat, lon
@@ -141,7 +145,7 @@ def calc_speed_from_pictures(iteration):
     logger.info(f"prev: {time_in_seconds_prev}, {lat_prev}, {lon_prev}")
 
     time_in_seconds = time_in_seconds_cur - time_in_seconds_prev
-    distance_in_km = haversine(lon_cur, lat_cur, lon_prev, lat_prev)
+    distance_in_km = haversine(lat_cur, lon_cur, lat_prev, lon_prev)
     logger.info(f"distance between images in km: {distance_in_km}")
     logger.info(f"time between images in s: {time_in_seconds}")
 
