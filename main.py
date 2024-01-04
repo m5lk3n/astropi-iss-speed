@@ -1,8 +1,9 @@
+import logzero
+from logzero import logger
 from datetime import datetime, timedelta
 from time import sleep
 from math import radians, cos, sin, asin, sqrt
 from exif import Image
-from logzero import logger
 from picamera import PiCamera
 from orbit import ISS
 
@@ -36,6 +37,9 @@ def convert_to_degress(value):
 
     return degrees + (minutes / 60.0) + (seconds / 3600.0)
 
+
+# Set a minimum log level
+logzero.loglevel(logzero.DEBUG) # for testing, use logzero.INFO for deployment
 
 # "CONSTANTS"
 IMAGE_PATH = "tests/"  # for testing, use "" for deployment
@@ -123,7 +127,7 @@ def take_picture(iss, camera, iteration):
     camera.exif_tags["GPS.GPSLongitude"] = exif_longitude
     camera.exif_tags["GPS.GPSLongitudeRef"] = "W" if west else "E"
 
-    logger.info(f"taking picture {IMAGE_PATH}{iteration}.jpg")
+    logger.debug(f"taking picture {IMAGE_PATH}{iteration}.jpg")
 
     # Capture the image
     camera.capture(f"{IMAGE_PATH}{iteration}.jpg")
@@ -131,33 +135,33 @@ def take_picture(iss, camera, iteration):
 
 def calc_speed_from_pictures(iteration):
     if iteration <= 0:
-        logger.info("nothing to compare")
+        logger.debug("nothing to compare")
         return (
             -1
         )  # we define a negative speed as an "invalid" value to indicate that we couldn't calculate
 
-    logger.info(f"comparing pictures {iteration}.jpg and {iteration - 1}.jpg")
+    logger.debug(f"comparing pictures {iteration}.jpg and {iteration - 1}.jpg")
 
     time_in_seconds_cur, lat_cur, lon_cur = get_image_meta_data(iteration)
-    logger.info(f"current: {time_in_seconds_cur}, {lat_cur}, {lon_cur}")
+    logger.debug(f"current: {time_in_seconds_cur}, {lat_cur}, {lon_cur}")
 
     time_in_seconds_prev, lat_prev, lon_prev = get_image_meta_data(iteration - 1)
-    logger.info(f"prev: {time_in_seconds_prev}, {lat_prev}, {lon_prev}")
+    logger.debug(f"prev: {time_in_seconds_prev}, {lat_prev}, {lon_prev}")
 
     time_in_seconds = time_in_seconds_cur - time_in_seconds_prev
     distance_in_km = haversine(lat_cur, lon_cur, lat_prev, lon_prev)
-    logger.info(f"distance between images in km: {distance_in_km}")
-    logger.info(f"time between images in s: {time_in_seconds}")
+    logger.debug(f"distance between images in km: {distance_in_km}")
+    logger.debug(f"time between images in s: {time_in_seconds}")
 
     speed = distance_in_km / time_in_seconds
-    logger.info(f"speed in km/s: {speed}")
+    logger.debug(f"speed in km/s: {speed}")
 
     return abs(speed)  # absolute value just in case
 
 
 ## https://projects.raspberrypi.org/en/projects/mission-space-lab-creator-guide/3
 
-logger.info("started")
+logger.debug("started")
 
 # init.
 start_time = datetime.now()
@@ -171,10 +175,10 @@ while now_time < start_time + timedelta(minutes=MAX_DURATION_IN_MINS):
     if i >= MAX_ITERATIONS:
         break  # exit while
 
-    logger.info(f"iteration {i} started")
+    logger.debug(f"iteration {i} started")
     take_picture(ISS(), cam, i)
     speed_in_kmps = calc_speed_from_pictures(i)
-    logger.info(f"iteration {i} ended in {speed_in_kmps} km/s")
+    logger.debug(f"iteration {i} ended in {speed_in_kmps} km/s")
 
     if speed_in_kmps >= 0:
         total_speed_in_kmps += speed_in_kmps
@@ -196,11 +200,11 @@ with open(result_file, "w", encoding="utf-8") as file:
     file.write(avg_speed_in_kmps_formatted)
 file.close()
 
-logger.info(f"result written to {result_file}")
+logger.debug(f"result written to {result_file}")
 
-logger.info(f"calculated travel speed of the ISS: {avg_speed_in_kmps_formatted} km/s")
+logger.debug(f"calculated travel speed of the ISS: {avg_speed_in_kmps_formatted} km/s")
 # https://projects.raspberrypi.org/en/projects/astropi-iss-speed/7
-logger.info("actual travel speed of the ISS: 7.66 km/s")
+logger.debug("actual travel speed of the ISS: 7.66 km/s")
 
 
-logger.info("ended")
+logger.debug("ended")

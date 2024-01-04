@@ -27,6 +27,11 @@ In Thonny, Tools -> Manage plug-ins -> Search and Install
 # to do
 
 - tests with python 3.9.2 on rasp pi
+- consider image sizes and available max. size
+- deploy (mode)
+- exception handling 
+- [testing](https://projects.raspberrypi.org/en/projects/mission-space-lab-creator-guide/5)
+- [improve accuracy](https://projects.raspberrypi.org/en/projects/mission-space-lab-creator-guide/4)
 
 # refs
 
