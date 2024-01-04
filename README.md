@@ -26,12 +26,14 @@ In Thonny, Tools -> Manage plug-ins -> Search and Install
 
 # to do
 
-- tests with python 3.9.2 on rasp pi
-- consider image sizes and available max. size
+- test with python 3.9.2 on rasp pi
+- consider max. amount of images (42), image sizes and available max. storage size (*"You are allowed to produce up to 250MB of data."*)
 - deploy (mode)
 - exception handling 
 - [testing](https://projects.raspberrypi.org/en/projects/mission-space-lab-creator-guide/5)
 - [improve accuracy](https://projects.raspberrypi.org/en/projects/mission-space-lab-creator-guide/4)
+- [document](https://projects.raspberrypi.org/en/projects/documenting-your-code/)
+- zip
 
 # refs
 
