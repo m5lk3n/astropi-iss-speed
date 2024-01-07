@@ -4,7 +4,7 @@ The goal of this project is to determine the ISS' travel speed around the earth 
 
 For more details, please see [this page](https://astro-pi.org/mission-space-lab).
 
-*The purpose of this repo is to provide a framework that allows to focus on the actual problem solving.*
+*The purpose of this repo is to provide a framework that allows to focus on the actual problem solving - **implementing `main.py`'s `calc_*` functions appropriately**!*
 
 ## Mission Space Lab Links
 
