@@ -8,12 +8,23 @@ from picamera import PiCamera
 from orbit import ISS
 
 
-# https://stackoverflow.com/questions/4913349/haversine-formula-in-python-bearing-and-distance-between-two-gps-points
-def haversine(lat1, lon1, lat2, lon2):
+# minimum log level
+logzero.loglevel(logzero.DEBUG)  # for testing, use logzero.INFO for deployment
+
+# "CONSTANTS"
+IMAGE_PATH = "tests/"  # for testing, use "" for deployment
+MAX_DURATION_IN_MINS = 1  # for testing, use 9 for deployment
+MAX_ITERATIONS = 3  # for testing, use 42 for deployment
+SLEEP_TIMEOUT_IN_SECS = 5  # for testing, TODO for deployment
+
+
+# calculates the distance using the Haversine formula
+def calc_distance_in_km(lat1, lon1, lat2, lon2):
     """
-    Calculate the great circle distance in kilometers between two points
-    on the earth (specified in decimal degrees)
+    https://en.wikipedia.org/wiki/Haversine_formula:
+    "The haversine formula determines the great-circle distance between two points on a sphere given their longitudes and latitudes."
     """
+
     # convert decimal degrees to radians
     lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
 
@@ -22,11 +33,14 @@ def haversine(lat1, lon1, lat2, lon2):
     dlat = lat2 - lat1
     a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
     c = 2 * asin(sqrt(a))
-    r = 6371  # Earth's mean radius in kilometers. Determines return value unit as km.
-    # - https://sci.esa.int/web/solar-system/-/35649-earth
-    r += 420  # ISS orbits earth at ~420km altitude as per ESA ISS tracker info
-    # - https://www.esa.int/Science_Exploration/Human_and_Robotic_Exploration/International_Space_Station/Where_is_the_International_Space_Station
-    # - https://www.esa.int/Science_Exploration/Human_and_Robotic_Exploration/Lessons_online/Life_in_Space#:~:text=The%20ISS%20is%20orbiting%20400,be%20taken%20there%20from%20Earth.
+    r = 6371  # Earth's mean radius in kilometers (https://sci.esa.int/web/solar-system/-/35649-earth). Determines return value unit as km!
+    """
+    ISS orbits earth at ~420km altitude as per ESA ISS tracker info:
+    - https://www.esa.int/Science_Exploration/Human_and_Robotic_Exploration/International_Space_Station/Where_is_the_International_Space_Station
+    - https://www.esa.int/Science_Exploration/Human_and_Robotic_Exploration/Lessons_online/Life_in_Space#:~:text=The%20ISS%20is%20orbiting%20400,be%20taken%20there%20from%20Earth.
+    """
+    r += 420
+
     return c * r
 
 
@@ -36,16 +50,6 @@ def convert_to_degress(value):
     seconds = value[2]
 
     return degrees + (minutes / 60.0) + (seconds / 3600.0)
-
-
-# Set a minimum log level
-logzero.loglevel(logzero.DEBUG) # for testing, use logzero.INFO for deployment
-
-# "CONSTANTS"
-IMAGE_PATH = "tests/"  # for testing, use "" for deployment
-MAX_DURATION_IN_MINS = 1  # for testing, use 9 for deployment
-MAX_ITERATIONS = 3  # for testing, use 42 for deployment
-SLEEP_TIMEOUT_IN_SECS = 5  # for testing, TODO for deployment
 
 
 # returns image time in seconds since Epoch time (1/1/1970)
@@ -149,7 +153,7 @@ def calc_speed_from_pictures(iteration):
     logger.debug(f"prev: {time_in_seconds_prev}, {lat_prev}, {lon_prev}")
 
     time_in_seconds = time_in_seconds_cur - time_in_seconds_prev
-    distance_in_km = haversine(lat_cur, lon_cur, lat_prev, lon_prev)
+    distance_in_km = calc_distance_in_km(lat_cur, lon_cur, lat_prev, lon_prev)
     logger.debug(f"distance between images in km: {distance_in_km}")
     logger.debug(f"time between images in s: {time_in_seconds}")
 
@@ -171,6 +175,13 @@ i = 0  # iteration
 cam = PiCamera()
 cam.resolution = (4056, 3040)
 
+"""
+take a picture every SLEEP_TIMEOUT_IN_SECS
+analyse the last two pictures taken to retrieve distance and time between those two
+calculate average travel speed in km/s
+stops after MAX_DURATION_IN_MINS and/or MAX_ITERATIONS (whichever is first)
+write average speed in result.txt
+"""
 while now_time < start_time + timedelta(minutes=MAX_DURATION_IN_MINS):
     if i >= MAX_ITERATIONS:
         break  # exit while
@@ -205,6 +216,5 @@ logger.debug(f"result written to {result_file}")
 logger.debug(f"calculated travel speed of the ISS: {avg_speed_in_kmps_formatted} km/s")
 # https://projects.raspberrypi.org/en/projects/astropi-iss-speed/7
 logger.debug("actual travel speed of the ISS: 7.66 km/s")
-
 
 logger.debug("ended")
